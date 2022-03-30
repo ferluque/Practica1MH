@@ -3,10 +3,12 @@
 //
 
 #include "Solution.h"
+#include "Problem.h"
+#include "random.hpp"
 #include <iostream>
 
 using namespace std;
 
 int main () {
-    Solution s;
+    Problem p("datos\\")
 }
