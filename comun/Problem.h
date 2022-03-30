@@ -69,10 +69,10 @@ public:
         N.erase(find(N.begin(), N.end(), u));
     };
 
-    int get_n() {return n;};
-    int get_m() {return m;};
-    const vector<int>& get_N() {return N;};
-    const vector<vector<float>>& get_d() {return d;};
+    int get_n() const {return n;};
+    int get_m() const {return m;};
+    const vector<int>& get_N() const {return N;};
+    const vector<vector<float>>& get_d() const {return d;};
 };
 
 #endif //MDD_PROBLEM_H

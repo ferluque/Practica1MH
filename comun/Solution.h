@@ -6,6 +6,8 @@
 #define MDD_SOLUTION_H
 
 #include <vector>
+#include <iostream>
+#include <fstream>
 using namespace std;
 
 class Solution {
@@ -23,7 +25,7 @@ private:
         float delta = this->delta(selected[selected.size()-1],d);
         if (delta>max_delta)
             max_delta = delta;
-        if (delta<min_delta)
+        if ((delta<min_delta)||(selected.size()==2)) // Añadimos condición para que con el segundo punto que se meta, se actualice el min_delta
             min_delta = delta;
         diff = max_delta-min_delta;
     };
@@ -34,10 +36,10 @@ private:
      * @param d La matriz de distancias
      * @return El valor de delta
      */
-    const float delta(int u, const vector<vector<float>>& d) {
+    float delta(int u, const vector<vector<float>>& d) {
         float de = 0.0;
-        for (auto it=selected.cbegin(); it!=selected.cend(); ++it)
-            de+=d[*it][u];
+        for (int i : selected)
+            de+=d[i][u];
         return de;
     };
 public:
@@ -48,8 +50,7 @@ public:
      */
     Solution(int p0, const vector<vector<float>>& d) {
         selected.push_back(p0);
-        min_delta = delta(p0, d);
-        max_delta = min_delta;
+        min_delta = max_delta = 0.0;
         diff = 0.0;
     };
     /**
@@ -64,7 +65,7 @@ public:
      * Constructor de copia
      * @param c
      */
-    Solution(Solution c) {
+    Solution(const Solution& c) {
         this->selected = c.selected;
         this->max_delta = c.max_delta;
         this->min_delta = c.min_delta;
@@ -77,9 +78,10 @@ public:
      * @return El valor de diff para selected union u
      */
     float get_new_diff(int u, const vector<vector<float>>& d) {
-        Solution posible(*this);
-        posible.add(u, d);
+        Solution posible(*this); // O(m)
+        posible.add(u, d); // O(m)
         return posible.get_diff();
+
     };
     /**
      * Añade un punto a la solución y actualiza el valor de diff
@@ -90,7 +92,38 @@ public:
         selected.push_back(u);
         update_diff(d);
     };
-    const float get_diff() {return diff;};
+    float get_diff() const {return diff;};
+
+    int get_size() const {return (int)selected.size();};
+
+    const vector<int>& get_selected() {return selected;};
+
+    void print_dist(string file_out, const vector<vector<float>>& d) {
+        ofstream out;
+        out.open(file_out);
+        out << ";";
+        for (int i: selected)
+            out << i << ";";
+        out << endl;
+        for (int i: selected) {
+            out << i << ";";
+            for (int j: selected) {
+                out << d[i][j] << ";";
+            }
+            out << endl;
+        }
+    }
 };
+
+ostream& operator<<(ostream& out, Solution s) {
+    out << "Escogidos: (";
+    vector<int> selected = s.get_selected();
+    for (int i : selected) {
+        out << i << ", ";
+    }
+    out << ")" << endl;
+    out << "Valor de diff: " << s.get_diff() << endl;
+    return out;
+}
 
 #endif //MDD_SOLUTION_H
