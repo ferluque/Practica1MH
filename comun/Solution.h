@@ -59,6 +59,41 @@ private:
             de+=d[i][u];
         return de;
     };
+
+    /**
+     * Intercambia el vecino i por j y modifica valores correspondientes
+     * @param i
+     * @param j
+     * @param d
+     * @return Devuelve la solución con los puntos cambiados
+     */
+    Solution exchange(int i, int j, vector<vector<float>> d) {
+        // EN primer lugar busco la posición de i en selected ( y en delta )
+        int posi = -1;
+        for (int k=0; (k<selected.size()) && (posi ==-1); k++)
+            if (selected[k] == i)
+                posi = k;
+
+        // Saco i de selected y de delta
+        selected.erase(selected.begin()+posi);
+        deltas.erase(deltas.begin()+posi);
+
+        // Meto j en selected y en delta
+        selected.push_back(j);
+        deltas.push_back(0.0);
+
+        // Actualizo los valores de min_delta y max_delta
+        // Para ello tengo que restar d[i][selected[k]] y sumar d[j][selected[k]] a los deltas
+        deltas[0] = min_delta = max_delta = deltas[0] - d[i][selected[0]] + d[j][selected[0]];
+        for (int k=1; k<deltas.size()-1; k++) {
+            deltas[k] = deltas[k] - d[i][selected[k]] + d[j][selected[k]];
+            check_max_min(deltas[k]);
+        }
+        deltas[deltas.size()-1] = delta(j, d);
+        check_max_min(deltas[deltas.size()-1]);
+        diff = max_delta - min_delta;
+        return *this;
+    }
 public:
     /**
      * Constructor que inicializa la solución con un punto inicial
@@ -77,7 +112,14 @@ public:
      * @param d La matriz de distancias
      */
     Solution(vector<int> s, const vector<vector<float>> d) {
-
+        selected = s;
+        deltas.resize(s.size());
+        deltas[0] = max_delta = min_delta = delta(s[0], d);
+        for (int i=1; i<selected.size(); i++) {
+            deltas[i] = delta(selected[i], d);
+            check_max_min(deltas[i]);
+        }
+        diff = max_delta - min_delta;
     }
     /**
      * Constructor de copia
@@ -111,6 +153,19 @@ public:
         selected.push_back(u);
         update_diff(d);
     };
+    /**
+     * Mecanismo de generación de vecinos. Intercambia el elemento i por el j y devuelve la solución con el respectivo
+     * valor de diff, max y min delta y deltas
+     * @param i El elemento que saca
+     * @param j El elemento que mete
+     * @return El vecino
+     */
+    Solution neighbor(int i, int j, vector<vector<float>> d) {
+        Solution vecino(*this);
+        return vecino.exchange(i,j,d);
+    }
+
+
     float get_diff() const {return diff;};
 
     int get_size() const {return (int)selected.size();};
@@ -142,6 +197,15 @@ ostream& operator<<(ostream& out, Solution s) {
     }
     out << ")" << endl;
     out << "Valor de diff: " << s.get_diff() << endl;
+    return out;
+}
+
+template <class T>
+ostream& operator<<(ostream& out, vector<T> v) {
+    out << "(";
+    for (auto it=v.begin(); it!=v.end();++it)
+        out << *it << ",";
+    out <<")" << endl;
     return out;
 }
 

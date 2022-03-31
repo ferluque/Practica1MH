@@ -69,6 +69,10 @@ public:
         N.erase(find(N.begin(), N.end(), u));
     };
 
+    void insert(int u) {
+        N.push_back(u);
+    }
+
     int get_n() const {return n;};
     int get_m() const {return m;};
     const vector<int>& get_N() const {return N;};
