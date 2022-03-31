@@ -16,17 +16,34 @@ private:
     float diff;
     float max_delta;
     float min_delta;
+    vector<float> deltas;
+
+    void check_max_min(float new_delta) {
+        if (new_delta > max_delta)
+            max_delta = new_delta;
+        if ((new_delta < min_delta)||(selected.size()==2))
+            min_delta = new_delta;
+    }
 
     /**
      * Actualiza el valor de diff con respecto al último valor de selected
      * @param d La matriz de distancias
      */
     void update_diff(const vector<vector<float>>& d){
-        float delta = this->delta(selected[selected.size()-1],d);
-        if (delta>max_delta)
-            max_delta = delta;
-        if ((delta<min_delta)||(selected.size()==2)) // Añadimos condición para que con el segundo punto que se meta, se actualice el min_delta
-            min_delta = delta;
+        // Actualizamos los valores de delta anteriores para todos con el nuevo punto
+        int nuevo = selected[selected.size()-1];
+
+        deltas[0] += d[selected[0]][nuevo];
+        max_delta = min_delta = deltas[0];
+        for (int i=1; i<deltas.size(); i++) {
+            deltas[i] += d[selected[i]][nuevo];
+            check_max_min(deltas[i]);
+        }
+
+        // Añado el delta del punto nuevo
+        deltas.push_back(delta(nuevo, d));
+        check_max_min(deltas[deltas.size()-1]);
+
         diff = max_delta-min_delta;
     };
 
@@ -52,6 +69,7 @@ public:
         selected.push_back(p0);
         min_delta = max_delta = 0.0;
         diff = 0.0;
+        deltas.push_back(0.0);
     };
     /**
      * Constructor que inicializa la solución al vector de seleccionados que le pasamos (función utilizada en la bl)
@@ -70,6 +88,7 @@ public:
         this->max_delta = c.max_delta;
         this->min_delta = c.min_delta;
         this->diff = c.diff;
+        this->deltas = c.deltas;
     };
     /**
      * Devuelve el nuevo valor de la función objetivo (factorizada) tras la inclusión de un nuevo punto
@@ -78,8 +97,8 @@ public:
      * @return El valor de diff para selected union u
      */
     float get_new_diff(int u, const vector<vector<float>>& d) {
-        Solution posible(*this); // O(m)
-        posible.add(u, d); // O(m)
+        Solution posible(*this);
+        posible.add(u,d);
         return posible.get_diff();
 
     };
