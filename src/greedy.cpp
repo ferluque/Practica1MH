@@ -26,9 +26,9 @@ int main () {
         // 5 ejecuciones
         int num_ejecuciones=10;
         vector<float> diffs(num_ejecuciones);
+        Random::seed(10);
         auto tinicio = clock();
         for (int i=0; i<num_ejecuciones; i++) {
-            Random::seed(i);
             Problem p(file);
             Solution S = greedy(p);
             diffs[i] = S.get_diff();

@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "C:/Users/Fernando/Desktop/Practica1MH/src/greedy.cpp" "CMakeFiles/greedy.dir/src/greedy.cpp.obj" "gcc" "CMakeFiles/greedy.dir/src/greedy.cpp.obj.d"
+  "C:/Users/fl156/Desktop/Practica1MH/src/greedy.cpp" "CMakeFiles/greedy.dir/src/greedy.cpp.obj" "gcc" "CMakeFiles/greedy.dir/src/greedy.cpp.obj.d"
   )
 
 # Targets to which this target links.
