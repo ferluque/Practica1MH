@@ -65,36 +65,24 @@ Solution bl(Problem p) {
     // se baraja y se van explorando en el orden que nos de el aleatorio
     while (contador < 1e5) {
         // También almacenamos el cambio que supone la generación de ese vecino
-        vector<pair<pair<int,int>, Solution>> vecinos;
+        vector<pair<int,int>> vecinos;
         for (int i=0; (i<s.get_selected().size())&&(contador < 1e5); ++i) {
             int saca = s.get_selected()[i];
             for (int j=0; (j<p.get_N().size())&&(contador < 1e5); ++j) {
                 int mete = p.get_N()[j];
-                Solution posible = s.neighbor(saca,mete,p.get_d());
-                pair<int,int> cambio(saca,mete);
-                pair<pair<int,int>,Solution> total(cambio, posible);
-                vecinos.push_back(total);
-                /*
-                ++contador;
-                if (posible.get_diff() < s.get_diff()) {
-                    s = posible;
-                    i = -1;
-                    j = p.get_N().size();
-                    p.insert(saca);
-                    p.extract(mete);
-                }*/
+                vecinos.push_back(pair<int,int>(saca, mete));
             }
         }
         // Una vez genere todos los vecinos los barajamos y los vamos sacando
         Random::shuffle(vecinos);
         for (auto it = vecinos.begin(); it!=vecinos.end(); ++it) {
             ++contador;
-            Solution v = (*it).second;
-            pair<int,int> cambio = (*it).first;
+            Solution v = s.neighbor((*it).first, (*it).second, p.get_d());
             if (v.get_diff() < s.get_diff()) {
                 s = v;
-                p.insert(cambio.first);
-                p.extract(cambio.second);
+                p.insert((*it).first);
+                p.extract((*it).second);
+                break;
             }
         }
     }
